@@ -22,11 +22,7 @@
 go.work
 
 .idea
-chat-api.yaml
-chat-api-dev.yaml
-chat-api-docker.yaml
-chat-api-local.yaml
+core-api.yaml
 build
 temp-files
 logs
-service/chat/api/.agollo
