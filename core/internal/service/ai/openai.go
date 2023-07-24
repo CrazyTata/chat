@@ -59,7 +59,7 @@ func NewOpenAi(ctx context.Context, conf config.Config) *OpenAi {
 		Config:   conf,
 		APIKeys:  conf.OpenAi.Key,
 		MaxToken: MaxToken,
-		Ctx:      ctx,
+		Ctx:      context.Background(),
 		Logger:   logx.WithContext(ctx),
 		Origin:   conf.OpenAi.Origin,
 		Engine:   conf.OpenAi.Engine,
@@ -356,6 +356,25 @@ func (c *OpenAi) ChatStream(req []structure.ChatModelMessage, channel chan strin
 	}
 }
 
+type T struct {
+	Type       string
+	Properties struct {
+		MovieTitle struct {
+			Type        string
+			Description string
+		}
+		ReleaseDate struct {
+			Type        string
+			Description string
+		}
+		Director struct {
+			Type        string
+			Description string
+		}
+	}
+	Required []string
+}
+
 func (c *OpenAi) Chat(req []structure.ChatModelMessage) (string, error) {
 
 	// 打印请求信息
@@ -385,12 +404,64 @@ func (c *OpenAi) Chat(req []structure.ChatModelMessage) (string, error) {
 			Content: message.Content,
 		})
 	}
+
+	paramsss := T{
+		Type: "",
+		Properties: struct {
+			MovieTitle struct {
+				Type        string
+				Description string
+			}
+			ReleaseDate struct {
+				Type        string
+				Description string
+			}
+			Director struct {
+				Type        string
+				Description string
+			}
+		}{
+			MovieTitle: struct {
+				Type        string
+				Description string
+			}{
+				Type:        "",
+				Description: "",
+			},
+			ReleaseDate: struct {
+				Type        string
+				Description string
+			}{
+				Type:        "",
+				Description: "",
+			},
+			Director: struct {
+				Type        string
+				Description string
+			}{
+				Type:        "",
+				Description: "",
+			},
+		},
+		Required: []string{
+			"ReleaseDate",
+			"Director",
+			"MovieTitle",
+		},
+	}
 	request := copenai.ChatCompletionRequest{
 		Model:       c.PostModel,
 		Messages:    messages,
 		MaxTokens:   c.MaxToken,
 		Temperature: c.Temperature,
 		TopP:        1,
+		Functions: []copenai.FunctionDefinition{
+			{
+				Name:        "aaa",
+				Description: "aaa",
+				Parameters:  paramsss,
+			},
+		},
 	}
 	var chat copenai.ChatCompletionResponse
 	chatOrigin, err1 := c.MakeOpenAILoopRequest(&OpenAIRequest{

@@ -25,3 +25,7 @@ func (c *ChatService) ChatStream(request []structure.ChatModelMessage, channel c
 func (c *ChatService) Completion(request string) (string, error) {
 	return c.strategy.Completion(request)
 }
+func (c *ChatService) SetConfig(model string, temperature float32, maxToken int) {
+	c.strategy.SetConfig(model, temperature, maxToken)
+	return
+}
